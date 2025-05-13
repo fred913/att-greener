@@ -137,6 +137,7 @@ export const exportAsInjection: TypeInjection = {
                     ).trim()
                     header += lrcHeader
                     if (lrcHeader) header += '\n'
+                    if (formatType == 'lqe') header += '\n'
                     break
 
                 case 'yrc':
