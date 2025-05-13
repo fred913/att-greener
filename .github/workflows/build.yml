@@ -10,7 +10,9 @@ on:
             - 'rollup.config.js'
             - 'tsconfig.json'
             - 'userscript.header.js'
-
+concurrency:
+    group: build-${{ github.ref }}
+    cancel-in-progress: true
 jobs:
     build:
         runs-on: ubuntu-latest

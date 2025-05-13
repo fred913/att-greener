@@ -39,3 +39,30 @@ export function autoTrimContainer(
         container.removeChild(container.lastChild)
     }
 }
+
+export function isCJKChar(char: string): boolean {
+    if (char.length !== 1) {
+        for (const c of char) {
+            if (isCJKChar(c)) return true
+        }
+        return false
+    }
+
+    const code = char.codePointAt(0)! // Using `codePointAt` to handle surrogate pairs
+    // Check if the character is in any of the CJK ranges
+    const resp =
+        (code >= 0x4e00 && code <= 0x9fff) || // Basic CJK Unified Ideographs
+        (code >= 0x3400 && code <= 0x4dbf) || // CJK Unified Ideographs Extension A
+        (code >= 0x20000 && code <= 0x2a6df) || // CJK Unified Ideographs Extension B
+        (code >= 0x2a700 && code <= 0x2b73f) || // CJK Unified Ideographs Extension C
+        (code >= 0x2b740 && code <= 0x2b81f) || // CJK Unified Ideographs Extension D
+        (code >= 0x2b820 && code <= 0x2ceaf) || // CJK Unified Ideographs Extension E
+        (code >= 0x2ceb0 && code <= 0x2ebef) || // CJK Unified Ideographs Extension F
+        (code >= 0x2f800 && code <= 0x2fa1f) || // CJK Compatibility Ideographs Supplement
+        (code >= 0x3040 && code <= 0x309f) || // Hiragana
+        (code >= 0x30a0 && code <= 0x30ff) || // Katakana
+        (code >= 0xac00 && code <= 0xd7af) // Hangul Syllables
+
+    // console.debug(`isCJKChar(${char}) = ${resp}`)
+    return resp
+}

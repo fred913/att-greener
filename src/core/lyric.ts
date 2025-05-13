@@ -1,3 +1,5 @@
+import { isCJKChar } from '../utils'
+
 export namespace CoreLyric {
     export class Timestamp {
         static max(...timestamps: (Timestamp | null)[]): Timestamp {
@@ -206,6 +208,63 @@ export namespace CoreLyric {
                     return line.extractAnnotations(role)
                 } else {
                     return []
+                }
+            })
+        }
+
+        export function splitWordSyllables(syl: Syllable): Syllable[] {
+            const res: Syllable[] = []
+            const totalDur = syl.end?.milliSeconds! - syl.start?.milliSeconds!
+            let pos = 0
+            let buf = ''
+            let remaining = syl.text
+            while (remaining.length > 0) {
+                const c = remaining[0]
+                if (isCJKChar(c) && buf.length > 0) {
+                    const partLength = (totalDur / syl.text.length) * buf.length
+                    res.push({
+                        text: buf,
+                        start: new Timestamp(syl.start?.milliSeconds! + pos),
+                        end: new Timestamp(
+                            syl.start?.milliSeconds! + pos + partLength
+                        ),
+                        annotations: syl.annotations,
+                    })
+                    pos += partLength
+                    buf = ''
+                }
+                buf += c
+                remaining = remaining.slice(1)
+            }
+
+            if (buf.length > 0) {
+                res.push({
+                    text: buf,
+                    start: new Timestamp(syl.start?.milliSeconds! + pos),
+                    end: new Timestamp(syl.end?.milliSeconds!),
+                    annotations: syl.annotations,
+                })
+            }
+
+            return res
+        }
+
+        export function preprocessLinesForLyricify(
+            lines: LineType[]
+        ): LineType[] {
+            return lines.map((line) => {
+                if (line instanceof SyllableSyncedLine) {
+                    const newSyls: CoreLyric.Syllable[] =
+                        line.syllables.flatMap(
+                            CoreLyric.Utils.splitWordSyllables
+                        )
+                    return new SyllableSyncedLine({
+                        syllables: newSyls,
+                        voiceAgent: line.voiceAgent,
+                        annotations: line.annotations,
+                    })
+                } else {
+                    return line
                 }
             })
         }
@@ -930,7 +989,32 @@ export namespace LyricIO {
             if (!worker) {
                 return '[ERROR] Unsupported'
             }
-            return worker(lines)
+            let preprocessedLines: CoreLyric.LineType[]
+            switch (type) {
+                case 'lys':
+                case 'lqe':
+                case 'yrc':
+                case 'qrc':
+                case 'krc':
+                    preprocessedLines =
+                        CoreLyric.Utils.preprocessLinesForLyricify(lines)
+                    break
+
+                case 'lyl':
+                case 'lrc':
+                case 'alrc':
+                case 'ttml':
+                case 'ttml_amll':
+                case 'apple_syllable':
+                case 'srt':
+                case 'spl':
+                    preprocessedLines = lines
+                    break
+
+                default:
+                    throw new Error('should not happen')
+            }
+            return worker(preprocessedLines)
         }
 
         export function supportDump(type: LyricFormat.Type): boolean {
