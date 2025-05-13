@@ -300,7 +300,7 @@ export const exportAsInjection: TypeInjection = {
                 const item = createExportAsMenuItem(
                     'lrc',
                     pron,
-                    '导出罗马音为 LRC (.lrc)'
+                    '导出音译为 LRC (.lrc)'
                 )
                 menu.itemsContainer.appendChild(item)
             }
