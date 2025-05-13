@@ -540,9 +540,9 @@ export namespace LyricIO {
             for (const lineData of linesData) {
                 editorBuffer += `[${properties[i]}]`
                 for (const syllableData of lineData) {
-                    editorBuffer += `${syllableData.text}(${
+                    editorBuffer += `${syllableData.text}(${Math.round(
                         syllableData.start
-                    },${syllableData.end - syllableData.start})`
+                    )},${Math.round(syllableData.end - syllableData.start)})`
                 }
                 editorBuffer += '\n'
                 i += 1
