@@ -6,5 +6,6 @@
 // @author       Sheng Fan
 // @match        https://amll-ttml-tool.stevexmh.net/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=amll-ttml-tool.stevexmh.net
-// @grant        none
+// @grant        unsafeWindow
+// @run-at       document-start
 // ==/UserScript==

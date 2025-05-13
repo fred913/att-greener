@@ -1,17 +1,19 @@
+declare const unsafeWindow: any
+
 export async function injectToastify() {
     document.head.insertAdjacentHTML(
         'beforeend',
         '<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">'
     )
 
-    const script = document.createElement('script')
+    const script = unsafeWindow.document.createElement('script')
     script.src = 'https://cdn.jsdelivr.net/npm/toastify-js'
-    document.body.appendChild(script)
 
     return new Promise((resolve) => {
         script.onload = () => {
             resolve(true)
         }
+        unsafeWindow.document.body.appendChild(script)
     })
 }
 
@@ -92,9 +94,8 @@ declare class ForeignToastify {
 }
 
 function getForeignToastify() {
-    const g = window as any
-    if (g.Toastify) {
-        return g.Toastify as (
+    if (unsafeWindow.Toastify) {
+        return unsafeWindow.Toastify as (
             options?: StartToastifyInstance.Options
         ) => ForeignToastify
     }
