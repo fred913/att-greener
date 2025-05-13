@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ATT Greener
 // @namespace    https://ft2.club/
-// @version      0.1.2
+// @version      0.1.3
 // @description  Provide a better experience for AMLL TTML Tool users.
 // @author       Sheng Fan
 // @match        https://amll-ttml-tool.stevexmh.net/*
