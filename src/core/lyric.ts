@@ -858,7 +858,7 @@ export namespace LyricIO {
             // original lyrics
             result += `[lyrics: ${LyricIO.Dumping.LQE.createLQEPartHeader({
                 format: 'Lyricify Syllable',
-                language: 'en-US',
+                // language: 'en-US',
             })}]\n`
             result += dumpLYS(lines).trimEnd()
             result += '\n\n'
@@ -868,7 +868,7 @@ export namespace LyricIO {
                 result += `\n[translation: ${LyricIO.Dumping.LQE.createLQEPartHeader(
                     {
                         format: 'LRC',
-                        language: 'zh-CN',
+                        // language: 'zh-CN',
                     }
                 )}]\n`
                 result += dumpLRC(transLy).trimEnd()
