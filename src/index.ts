@@ -3,6 +3,8 @@ import { initLyricsHold } from './lyricsHold'
 import { injectToastify, Toastify } from './toastifyLoader'
 ;(function main(): void {
     'use strict'
+
+    localStorage.setItem('noticeLevelDialog', '9')
     injectToastify().then(() => {
         initLyricsHold()
         createRadixMenuObs()
