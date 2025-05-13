@@ -120,11 +120,23 @@ export const exportAsInjection: TypeInjection = {
             switch (formatType) {
                 case 'lyl':
                     header += '[type:LyricifyLines]\n'
+                case 'lqe':
+                    if (formatType == 'lqe') {
+                        // [Lyricify Quick Export] // 作为统一的头部标记，用于识别
+                        // [version:1.0] // 此处记录 Lyricify Quick Export 的定义版本
+                        // [ti:xxx] // Tag 信息直接写在最前面，不放进歌词
+                        // [ar, al, by, ... 同理]
+                        header += '[Lyricify Quick Export]\n'
+                        header += '[version:1.0]\n'
+                    }
                 case 'lys':
                 case 'qrc':
                 case 'lrc':
-                    header += attMetaToLrcHeader(currAtt?.metadata || []).trim()
-                    header += '\n'
+                    const lrcHeader = attMetaToLrcHeader(
+                        currAtt?.metadata || []
+                    ).trim()
+                    header += lrcHeader
+                    if (lrcHeader) header += '\n'
                     break
 
                 case 'yrc':
@@ -134,17 +146,6 @@ export const exportAsInjection: TypeInjection = {
                         })
                         .join('\n')
                     header += '\n'
-                    break
-
-                case 'lqe':
-                    // [Lyricify Quick Export] // 作为统一的头部标记，用于识别
-                    // [version:1.0] // 此处记录 Lyricify Quick Export 的定义版本
-                    // [ti:xxx] // Tag 信息直接写在最前面，不放进歌词
-                    // [ar, al, by, ... 同理]
-                    header += '[Lyricify Quick Export]\n'
-                    header += '[version:1.0]\n'
-                    header += attMetaToLrcHeader(currAtt?.metadata || []).trim()
-                    header += '\n\n'
                     break
 
                 default:

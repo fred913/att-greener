@@ -1,5 +1,7 @@
 import { isCJKChar } from '../utils'
 
+declare const unsafeWindow: typeof window
+
 export namespace CoreLyric {
     export class Timestamp {
         static max(...timestamps: (Timestamp | null)[]): Timestamp {
@@ -214,23 +216,22 @@ export namespace CoreLyric {
 
         export function splitWordSyllables(syl: Syllable): Syllable[] {
             const res: Syllable[] = []
-            const totalDur = syl.end?.milliSeconds! - syl.start?.milliSeconds!
-            let pos = 0
             let buf = ''
             let remaining = syl.text
             while (remaining.length > 0) {
                 const c = remaining[0]
-                if (isCJKChar(c) && buf.length > 0) {
-                    const partLength = (totalDur / syl.text.length) * buf.length
+                if (
+                    isCJKChar(c) &&
+                    buf.length > 0 &&
+                    buf != '(' &&
+                    buf != '（'
+                ) {
                     res.push({
                         text: buf,
-                        start: new Timestamp(syl.start?.milliSeconds! + pos),
-                        end: new Timestamp(
-                            syl.start?.milliSeconds! + pos + partLength
-                        ),
+                        start: null,
+                        end: null,
                         annotations: syl.annotations,
                     })
-                    pos += partLength
                     buf = ''
                 }
                 buf += c
@@ -238,12 +239,34 @@ export namespace CoreLyric {
             }
 
             if (buf.length > 0) {
-                res.push({
-                    text: buf,
-                    start: new Timestamp(syl.start?.milliSeconds! + pos),
-                    end: new Timestamp(syl.end?.milliSeconds!),
-                    annotations: syl.annotations,
-                })
+                if (buf == ')' || buf == '）') res[res.length - 1].text += buf
+                else
+                    res.push({
+                        text: buf,
+                        start: null,
+                        end: null,
+                        annotations: syl.annotations,
+                    })
+            }
+
+            const totalDur = syl.end?.milliSeconds! - syl.start?.milliSeconds!
+            let pos = 0
+
+            // reassign time
+            for (const i in res) {
+                const partLength =
+                    (totalDur / syl.text.replace(/[\(\)（）]/g, '').length) *
+                    res[i].text.replace(/[\(\)（）]/g, '').length
+
+                const s = res[i]
+                s.start = new Timestamp(
+                    Math.round(syl.start?.milliSeconds! + pos)
+                )
+                s.end = new Timestamp(
+                    Math.round(syl.start?.milliSeconds! + pos + partLength)
+                )
+
+                pos += partLength
             }
 
             return res
@@ -255,9 +278,7 @@ export namespace CoreLyric {
             return lines.map((line) => {
                 if (line instanceof SyllableSyncedLine) {
                     const newSyls: CoreLyric.Syllable[] =
-                        line.syllables.flatMap(
-                            CoreLyric.Utils.splitWordSyllables
-                        )
+                        line.syllables.flatMap(splitWordSyllables)
                     return new SyllableSyncedLine({
                         syllables: newSyls,
                         voiceAgent: line.voiceAgent,
@@ -1096,7 +1117,7 @@ export namespace LyricFormat {
     ): Promise<string | null> {
         const fileTypes = languageExtensions.map((ext) => `${ext}`)
         // @ts-ignore
-        const fileHandles = await window.showOpenFilePicker({
+        const fileHandles = await unsafeWindow.showOpenFilePicker({
             types: [
                 {
                     description,
@@ -1123,7 +1144,7 @@ export namespace LyricFormat {
     ): Promise<boolean> {
         const fileTypes = languageExtensions.map((ext) => `${ext}`)
         // @ts-ignore
-        const fileHandle = await window.showSaveFilePicker({
+        const fileHandle = await unsafeWindow.showSaveFilePicker({
             types: [
                 {
                     description,

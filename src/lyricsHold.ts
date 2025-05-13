@@ -32,6 +32,8 @@ export function currentLyricsToCoreLyric():
     return null
 }
 
+declare const unsafeWindow: any
+
 export function initLyricsHold() {
-    console.log = fakeConsoleLog
+    unsafeWindow.console.log = fakeConsoleLog
 }
