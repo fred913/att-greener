@@ -155,6 +155,7 @@ export const exportAsInjection: TypeInjection = {
             switch (formatType) {
                 case 'lys':
                 case 'qrc':
+                case 'lqe':
                     // special fix
                     // `\((\d+),(\d+)\) \(0,0\)` TO ` ($1,$2)`
                     fixedCl = currCl.map(fixLineForLys)
