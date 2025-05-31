@@ -79,16 +79,26 @@ export const exportAsInjection: TypeInjection = {
         console.log(menu)
         console.log('Detected exportAs menu, doing injection')
 
-        for (let i = 0; i < menu.itemsContainer.children.length; ) {
-            const item = menu.itemsContainer.children[i]
-            if ((item as HTMLElement).innerText.trim() !== '导出到 ASS 字幕') {
-                ;(item as HTMLElement).innerText =
-                    '导出到 ASS (.ass) (旧版选项)'
-                i++
-                continue
-            }
-            menu.itemsContainer.removeChild(item)
-        }
+        // for (let i = 0; i < menu.itemsContainer.children.length; ) {
+        //     const item = menu.itemsContainer.children[i]
+        //     if ((item as HTMLElement).innerText.trim() !== '导出到 ASS 字幕') {
+        //         ;(item as HTMLElement).innerText =
+        //             '导出到 ASS (.ass) (旧版选项)'
+        //         i++
+        //         continue
+        //     }
+        //     menu.itemsContainer.removeChild(item)
+        // }
+        // <div role="separator" aria-orientation="horizontal" class="rt-BaseMenuSeparator rt-DropdownMenuSeparator"></div>
+        const sep = document.createElement('div')
+        sep.classList.add(
+            'rt-reset',
+            'rt-BaseMenuSeparator',
+            'rt-DropdownMenuSeparator'
+        )
+        sep.setAttribute('role', 'separator')
+        sep.setAttribute('aria-orientation', 'horizontal')
+        menu.itemsContainer.appendChild(sep)
 
         const currAtt = getCurrentLyrics()
         const currCl = currentLyricsToCoreLyric()
